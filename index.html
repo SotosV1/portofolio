@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dev & Drone Pilot — Portfolio</title>
-    <meta name="description" content="15-year-old developer and DJI Mini 4 Pro drone pilot. Building WebApps and capturing 4K aerial cinematography.">
+    <meta name="description" content="15-year-old developer and DJI Mini 4K drone pilot. Building WebApps and capturing 4K aerial cinematography.">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
 
@@ -934,6 +934,144 @@
         }
 
         /* ============================================
+           CINEMATIC VIDEO INTERLUDE
+           ============================================ */
+        .video-interlude {
+            position: relative;
+            height: 70vh;
+            overflow: hidden;
+        }
+
+        .video-interlude video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-interlude-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, var(--bg) 0%, rgba(3,3,3,0.2) 30%, rgba(3,3,3,0.2) 70%, var(--bg) 100%);
+        }
+
+        .video-interlude-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            text-align: center;
+            padding: 0 40px;
+        }
+
+        .video-interlude-text h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(36px, 6vw, 80px);
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .video-interlude-text p {
+            font-size: 14px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* ============================================
+           FEATURED DRONE CARD (FULL WIDTH)
+           ============================================ */
+        .drone-card.featured {
+            grid-column: 1 / -1;
+            aspect-ratio: 21/9;
+        }
+
+        .drone-card.featured .drone-card-info h3 {
+            font-size: 28px;
+        }
+
+        /* ============================================
+           FILM STRIP SECTION
+           ============================================ */
+        .film-strip-section {
+            padding: clamp(60px, 10vh, 120px) 0;
+            overflow: hidden;
+        }
+
+        .film-strip-header {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding: 0 40px;
+            text-align: center;
+        }
+
+        .film-strip-track {
+            display: flex;
+            gap: 20px;
+            padding: 0 20px;
+            width: max-content;
+        }
+
+        .film-strip-item {
+            position: relative;
+            width: 400px;
+            height: 260px;
+            border-radius: 12px;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: none;
+        }
+
+        .film-strip-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1s var(--ease-out-expo);
+        }
+
+        .film-strip-item:hover video {
+            transform: scale(1.08);
+        }
+
+        .film-strip-item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(3,3,3,0.85) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .film-strip-item-info {
+            position: absolute;
+            bottom: 18px;
+            left: 22px;
+            z-index: 2;
+        }
+
+        .film-strip-item-info h4 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .film-strip-item-info span {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* ============================================
            REVEAL ANIMATIONS
            ============================================ */
         .reveal-up {
@@ -984,6 +1122,15 @@
                 padding-left: 24px;
                 padding-right: 24px;
             }
+
+            .video-interlude { height: 50vh; }
+
+            .film-strip-item {
+                width: 300px;
+                height: 200px;
+            }
+
+            .drone-card.featured { aspect-ratio: 16/9; }
         }
 
         @media (max-width: 500px) {
@@ -1075,7 +1222,7 @@
                 </h1>
 
                 <p class="hero-sub" id="heroSub">
-                    3rd year middle school student with a dream of becoming a developer. Building WebApps and flying my DJI Mini 4 in 4K.
+                    3rd year middle school student with a dream of becoming a developer. Building WebApps and flying my DJI Mini 4K.
                 </p>
 
                 <div class="hero-ctas" id="heroCtas">
@@ -1109,7 +1256,7 @@
             <span class="filled">DRONE PILOT</span>
             <span>CINEMATOGRAPHY</span>
             <span class="filled">CALIFORGE</span>
-            <span>DJI MINI 4 PRO</span>
+            <span>DJI MINI 4K</span>
             <span class="filled">4K AERIAL</span>
             <span>WEB APPS</span>
             <span class="filled">CREATIVE CODE</span>
@@ -1117,7 +1264,7 @@
             <span class="filled">DRONE PILOT</span>
             <span>CINEMATOGRAPHY</span>
             <span class="filled">CALIFORGE</span>
-            <span>DJI MINI 4 PRO</span>
+            <span>DJI MINI 4K</span>
             <span class="filled">4K AERIAL</span>
             <span>WEB APPS</span>
             <span class="filled">CREATIVE CODE</span>
@@ -1176,7 +1323,21 @@
     </section>
 
     <!-- ============================================
-         3. DRONE CINEMATOGRAPHY
+         CINEMATIC INTERLUDE
+         ============================================ -->
+    <section class="video-interlude" id="interlude1">
+        <video autoplay loop muted playsinline id="interludeVideo1">
+            <source src="https://videos.pexels.com/video-files/3571264/3571264-uhd_2732_1440_30fps.mp4" type="video/mp4">
+        </video>
+        <div class="video-interlude-overlay"></div>
+        <div class="video-interlude-text">
+            <h2 id="interludeH2">EYES IN<br>THE SKY</h2>
+            <p id="interludeP">DJI MINI 4K — AERIAL CINEMA</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         3. DRONE CINEMATOGRAPHY (EXPANDED)
          ============================================ -->
     <section id="cinematography" class="drone-section">
         <div class="section-inner">
@@ -1185,14 +1346,27 @@
                     <i data-lucide="video" style="width:14px;height:14px"></i>
                     AERIAL CINEMATOGRAPHY
                 </div>
-                <h2 class="section-heading" style="text-align:center;font-style:italic">DJI MINI 4 PRO CINEMATICS</h2>
-                <p>Capturing the world in 4K from the skies. I specialize in Orbit, Tracking, and Waypoint shots.</p>
+                <h2 class="section-heading" style="text-align:center;font-style:italic">DJI MINI 4K CINEMATICS</h2>
+                <p>Capturing the world in 4K from the skies. I specialize in Orbit, Tracking, Reveal, and Waypoint shots.</p>
             </div>
 
             <div class="drone-grid">
+                <!-- FEATURED WIDE SHOT -->
+                <div class="drone-card featured reveal-up" data-tilt data-cursor="Play">
+                    <video autoplay loop muted playsinline>
+                        <source src="https://videos.pexels.com/video-files/1739010/1739010-uhd_2560_1440_24fps.mp4" type="video/mp4">
+                    </video>
+                    <div class="drone-card-overlay"></div>
+                    <div class="drone-card-info">
+                        <h3>GOLDEN HOUR PANORAMA</h3>
+                        <span>4K / HYPERLAPSE / D-LOG M</span>
+                    </div>
+                </div>
+
+                <!-- SHOT 1 -->
                 <div class="drone-card reveal-up" data-tilt data-cursor="Play">
                     <video autoplay loop muted playsinline>
-                        <source src="https://videos.pexels.com/video-files/4204543/4204543-uhd_2732_1440_25fps.mp4" type="video/mp4">
+                        <source src="https://videos.pexels.com/video-files/2611150/2611150-uhd_2560_1440_25fps.mp4" type="video/mp4">
                     </video>
                     <div class="drone-card-overlay"></div>
                     <div class="drone-card-info">
@@ -1201,9 +1375,10 @@
                     </div>
                 </div>
 
+                <!-- SHOT 2 -->
                 <div class="drone-card reveal-up" data-tilt data-cursor="Play">
                     <video autoplay loop muted playsinline>
-                        <source src="https://videos.pexels.com/video-files/19448855/19448855-hd_1920_1080_24fps.mp4" type="video/mp4">
+                        <source src="https://videos.pexels.com/video-files/3629519/3629519-uhd_2560_1440_24fps.mp4" type="video/mp4">
                     </video>
                     <div class="drone-card-overlay"></div>
                     <div class="drone-card-info">
@@ -1211,6 +1386,87 @@
                         <span>4K / ACTIVE TRACK</span>
                     </div>
                 </div>
+
+                <!-- SHOT 3 -->
+                <div class="drone-card reveal-up" data-tilt data-cursor="Play">
+                    <video autoplay loop muted playsinline>
+                        <source src="https://videos.pexels.com/video-files/1093662/1093662-uhd_2560_1440_30fps.mp4" type="video/mp4">
+                    </video>
+                    <div class="drone-card-overlay"></div>
+                    <div class="drone-card-info">
+                        <h3>MOUNTAIN REVEAL</h3>
+                        <span>4K / ORBIT MODE</span>
+                    </div>
+                </div>
+
+                <!-- SHOT 4 -->
+                <div class="drone-card reveal-up" data-tilt data-cursor="Play">
+                    <video autoplay loop muted playsinline>
+                        <source src="https://videos.pexels.com/video-files/3194277/3194277-uhd_2560_1440_30fps.mp4" type="video/mp4">
+                    </video>
+                    <div class="drone-card-overlay"></div>
+                    <div class="drone-card-info">
+                        <h3>SUNSET TRACKING</h3>
+                        <span>4K / WAYPOINT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FILM STRIP HORIZONTAL SCROLL
+         ============================================ -->
+    <section class="film-strip-section">
+        <div class="film-strip-header reveal-up">
+            <div class="section-label" style="justify-content:center">
+                <i data-lucide="film" style="width:14px;height:14px"></i>
+                MORE SHOTS
+            </div>
+            <h2 class="section-heading" style="text-align:center">THE REEL</h2>
+        </div>
+        <div class="film-strip-track" id="filmStrip">
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/4763824/4763824-uhd_2560_1440_24fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>River Bend</h4><span>AERIAL / 4K</span></div>
+            </div>
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/1654172/1654172-uhd_2560_1440_24fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>City Lights</h4><span>DRONE / NIGHT</span></div>
+            </div>
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/3571264/3571264-uhd_2732_1440_30fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>Urban Grid</h4><span>TOP-DOWN / 4K</span></div>
+            </div>
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/4328401/4328401-uhd_2560_1440_25fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>Cloud Break</h4><span>ORBIT / 4K</span></div>
+            </div>
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/2491284/2491284-uhd_2560_1440_24fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>Horizon Line</h4><span>TRACKING / 4K</span></div>
+            </div>
+            <div class="film-strip-item" data-cursor="View">
+                <video autoplay loop muted playsinline>
+                    <source src="https://videos.pexels.com/video-files/3571264/3571264-uhd_2732_1440_30fps.mp4" type="video/mp4">
+                </video>
+                <div class="film-strip-item-overlay"></div>
+                <div class="film-strip-item-info"><h4>Coastal Sweep</h4><span>POI / 4K</span></div>
             </div>
         </div>
     </section>
@@ -1237,7 +1493,7 @@
                 <a href="#" class="social-icon" data-magnetic data-cursor="Instagram">
                     <i data-lucide="instagram" style="width:22px;height:22px"></i>
                 </a>
-                <a href="mailto:sotirisvas2011@gmail.com" class="social-icon" data-magnetic data-cursor="Email">
+                <a href="mailto:sotosvbusiness@gmail.com" class="social-icon" data-magnetic data-cursor="Email">
                     <i data-lucide="mail" style="width:22px;height:22px"></i>
                 </a>
                 <a href="tel:+306981847788" class="social-icon" data-magnetic data-cursor="Call">
@@ -1246,9 +1502,9 @@
             </div>
 
             <div class="contact-links">
-                <a href="mailto:sotirisvas2011@gmail.com" data-magnetic>
+                <a href="mailto:sotosvbusiness@gmail.com" data-magnetic>
                     <i data-lucide="mail" style="width:16px;height:16px"></i>
-                    sotirisvas2011@gmail.com
+                    sotosvbusiness@gmail.com
                 </a>
                 <a href="tel:+306981847788" data-magnetic>
                     <i data-lucide="phone" style="width:16px;height:16px"></i>
@@ -1518,6 +1774,45 @@
                 }
             }
         });
+
+        // ── CINEMATIC INTERLUDE TEXT REVEAL ──
+        const interH2 = document.getElementById('interludeH2');
+        const interP = document.getElementById('interludeP');
+        if (interH2) {
+            gsap.to(interH2, {
+                opacity: 1, y: 0, duration: 1.4, ease: 'power3.out',
+                scrollTrigger: { trigger: '#interlude1', start: 'top 60%', toggleActions: 'play none none reverse' }
+            });
+            gsap.to(interP, {
+                opacity: 1, y: 0, duration: 1, ease: 'power3.out', delay: 0.3,
+                scrollTrigger: { trigger: '#interlude1', start: 'top 60%', toggleActions: 'play none none reverse' }
+            });
+        }
+
+        // ── INTERLUDE VIDEO PARALLAX ──
+        const interVid = document.getElementById('interludeVideo1');
+        if (interVid) {
+            gsap.to(interVid, {
+                yPercent: 20, scale: 1.1, ease: 'none',
+                scrollTrigger: { trigger: '#interlude1', start: 'top bottom', end: 'bottom top', scrub: true }
+            });
+        }
+
+        // ── FILM STRIP HORIZONTAL SCROLL ──
+        const filmStrip = document.getElementById('filmStrip');
+        if (filmStrip) {
+            const totalW = filmStrip.scrollWidth - window.innerWidth;
+            gsap.to(filmStrip, {
+                x: -totalW,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: '.film-strip-section',
+                    start: 'top 80%',
+                    end: 'bottom 20%',
+                    scrub: 1,
+                }
+            });
+        }
 
         // ── MOBILE MENU ──
         const toggle = document.getElementById('mobileToggle');
