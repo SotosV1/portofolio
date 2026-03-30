@@ -1,309 +1,1558 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dev & Drone Pilot — Portfolio</title>
-    <!-- Local Favicon -->
+    <meta name="description" content="15-year-old developer and DJI Mini 4 Pro drone pilot. Building WebApps and capturing 4K aerial cinematography.">
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
-    <!-- Tailwind CSS 3 CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- GSAP for Professional Animations -->
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- GSAP + ScrollTrigger + Lenis -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@300;500;700&display=swap');
+        /* ============================================
+           RESET & FOUNDATIONS
+           ============================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         :root {
-            --bg-color: #030303;
-            --accent-color: #e11d48;
-            --text-color: #f0f0f0;
+            --bg: #030303;
+            --bg-alt: #0a0a0a;
+            --accent: #e11d48;
+            --accent-glow: rgba(225, 29, 72, 0.4);
+            --text: #f0f0f0;
+            --text-dim: #71717a;
+            --text-muted: #3f3f46;
+            --radius: 16px;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             overflow-x: hidden;
+            cursor: none;
         }
 
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.03em;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        img, video { display: block; max-width: 100%; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(225, 29, 72, 0.3); border-radius: 10px; }
+
+        /* Selection */
+        ::selection {
+            background: rgba(225, 29, 72, 0.3);
+            color: #fff;
+        }
+
+        /* ============================================
+           LOADING SCREEN
+           ============================================ */
+        .loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s var(--ease-out-expo), visibility 0.8s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-counter {
+            font-family: 'Space Grotesk', monospace;
+            font-size: clamp(60px, 15vw, 180px);
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: var(--text-muted);
+            margin-top: 30px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-bar-fill {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+
+        .loader-label {
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        /* ============================================
+           CUSTOM CURSOR
+           ============================================ */
+        .cursor-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            transition: width 0.4s var(--ease-out-expo), height 0.4s var(--ease-out-expo), background 0.3s;
+        }
+
+        .cursor-ring {
+            position: fixed;
+            width: 45px;
+            height: 45px;
+            border: 1.5px solid rgba(225, 29, 72, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s var(--ease-out-expo), height 0.5s var(--ease-out-expo),
+                        border-color 0.3s, background 0.3s, opacity 0.3s;
+        }
+
+        .cursor-dot.hovering {
+            width: 60px;
+            height: 60px;
+            background: rgba(225, 29, 72, 0.15);
+            mix-blend-mode: normal;
+        }
+
+        .cursor-ring.hovering {
+            width: 70px;
+            height: 70px;
+            border-color: var(--accent);
+            opacity: 0.5;
+        }
+
+        .cursor-label {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .cursor-label.visible { opacity: 1; }
+
+        @media (pointer: coarse) {
+            .cursor-dot, .cursor-ring, .cursor-label { display: none; }
+            body { cursor: auto; }
+        }
+
+        /* ============================================
+           SCROLL PROGRESS BAR
+           ============================================ */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #fb7185, var(--accent));
+            z-index: 9998;
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+
+        /* ============================================
+           HUD OVERLAY
+           ============================================ */
+        .hud {
+            position: fixed;
+            z-index: 9990;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+
+        .hud-top-left {
+            top: 30px;
+            left: 30px;
+        }
+
+        .hud-top-right {
+            top: 30px;
+            right: 30px;
+            text-align: right;
+        }
+
+        .hud-bottom-left {
+            bottom: 30px;
+            left: 30px;
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            mix-blend-mode: difference;
+        }
+
+        .nav-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
             letter-spacing: -0.02em;
         }
 
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
         }
 
-        .cinematic-overlay {
-            background: linear-gradient(to bottom, rgba(3,3,3,0.4) 0%, rgba(3,3,3,0.8) 100%);
+        .nav-links a {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text);
+            position: relative;
+            padding-bottom: 4px;
         }
 
-        /* Glassmorphism Classes */
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1.5px;
+            background: var(--accent);
+            transition: width 0.5s var(--ease-out-expo);
         }
 
-        .hero-title {
+        .nav-links a:hover::after { width: 100%; }
+
+        /* Mobile Menu */
+        .mobile-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: none;
+            border: none;
+            cursor: none;
+            padding: 8px;
+            z-index: 1001;
+        }
+
+        .mobile-toggle span {
+            width: 28px;
+            height: 2px;
+            background: var(--text);
+            transition: all 0.4s var(--ease-out-expo);
+            transform-origin: center;
+        }
+
+        .mobile-toggle.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .mobile-toggle.open span:nth-child(2) { opacity: 0; }
+
+        .mobile-toggle.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            clip-path: circle(0% at calc(100% - 50px) 40px);
+            transition: clip-path 0.8s var(--ease-out-expo);
+        }
+
+        .mobile-menu.open {
+            clip-path: circle(150% at calc(100% - 50px) 40px);
+        }
+
+        .mobile-menu a {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             opacity: 0;
             transform: translateY(30px);
         }
 
-        .scroll-reveal {
+        .mobile-menu.open a {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s var(--ease-out-expo);
+        }
+
+        .mobile-menu.open a:nth-child(1) { transition-delay: 0.2s; }
+        .mobile-menu.open a:nth-child(2) { transition-delay: 0.3s; }
+        .mobile-menu.open a:nth-child(3) { transition-delay: 0.4s; }
+        .mobile-menu.open a:nth-child(4) { transition-delay: 0.5s; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .mobile-toggle { display: flex; }
+            .hud { display: none; }
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-video-wrap {
+            position: absolute;
+            inset: 0;
+        }
+
+        .hero-video-wrap video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.15);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(3, 3, 3, 0.3) 0%,
+                rgba(3, 3, 3, 0.6) 50%,
+                rgba(3, 3, 3, 0.95) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 650px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 100px;
+            background: rgba(225, 29, 72, 0.1);
+            border: 1px solid rgba(225, 29, 72, 0.2);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 28px;
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(20px);
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
+        .hero-heading {
+            font-size: clamp(40px, 7vw, 90px);
+            font-weight: 800;
+            line-height: 0.95;
+            margin-bottom: 24px;
         }
 
-        .crimson-glow-bottom {
-            filter: drop-shadow(0px 40px 60px rgba(225, 29, 72, 0.6)) drop-shadow(0px 10px 20px rgba(225, 29, 72, 0.4));
+        .hero-heading .line {
+            display: block;
+            overflow: hidden;
+        }
+
+        .hero-heading .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        .hero-heading .gradient-text {
+            background: linear-gradient(135deg, var(--accent), #fb7185, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: clamp(16px, 1.5vw, 20px);
+            color: var(--text-dim);
+            line-height: 1.7;
+            max-width: 500px;
+            margin-bottom: 40px;
+            font-weight: 300;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: none;
+            cursor: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .btn-ghost {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .hero-3d {
+            position: absolute;
+            top: 50%;
+            right: -12vw;
+            transform: translateY(-50%);
+            width: clamp(500px, 55vw, 1100px);
+            height: clamp(500px, 55vw, 1100px);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .hero-3d iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transform: scale(0.65);
+        }
+
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+        }
+
+        .hero-scroll-indicator span {
+            font-size: 10px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 50px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+        /* ============================================
+           MARQUEE SECTION
+           ============================================ */
+        .marquee {
+            padding: 60px 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 60px;
+            white-space: nowrap;
+            animation: marqueeScroll 30s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-track span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(30px, 5vw, 70px);
+            font-weight: 700;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.08);
+            letter-spacing: -0.02em;
+        }
+
+        .marquee-track span.filled {
+            -webkit-text-stroke: 0;
+            color: rgba(225, 29, 72, 0.15);
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ============================================
+           SECTION COMMON
+           ============================================ */
+        .section {
+            padding: clamp(80px, 12vh, 160px) 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 24px;
+        }
+
+        /* ============================================
+           PORTFOLIO SECTION
+           ============================================ */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .browser-mockup {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            padding: 10px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+
+        .browser-bar {
+            height: 32px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            gap: 8px;
+        }
+
+        .browser-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .browser-dot.red { background: #ef4444aa; }
+        .browser-dot.yellow { background: #eab308aa; }
+        .browser-dot.green { background: #22c55eaa; }
+
+        .browser-url {
+            margin-left: 16px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .browser-viewport {
+            height: 380px;
+            overflow: hidden;
+            background: #050505;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .browser-viewport iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            opacity: 0.85;
+            transition: opacity 0.6s var(--ease-out-expo);
+        }
+
+        .browser-mockup:hover .browser-viewport iframe {
+            opacity: 1;
+        }
+
+        .portfolio-info p {
+            font-size: 17px;
+            color: var(--text-dim);
+            line-height: 1.75;
+            margin-bottom: 32px;
+            font-weight: 300;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .feature-item svg { color: var(--accent); flex-shrink: 0; }
+
+        /* ============================================
+           DRONE / CINEMATOGRAPHY
+           ============================================ */
+        .drone-section {
+            background: var(--bg-alt);
+            padding: clamp(80px, 12vh, 160px) 0;
+        }
+
+        .drone-section .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .drone-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .drone-header p {
+            font-size: 18px;
+            color: var(--text-dim);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .drone-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .drone-card {
+            position: relative;
+            aspect-ratio: 16/9;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: none;
+            perspective: 800px;
+            transform-style: preserve-3d;
+        }
+
+        .drone-card video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 1.5s var(--ease-out-expo);
+        }
+
+        .drone-card:hover video {
+            transform: scale(1.08);
+        }
+
+        .drone-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(3, 3, 3, 0.8) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .drone-card-info {
+            position: absolute;
+            bottom: 24px;
+            left: 28px;
+            z-index: 2;
+        }
+
+        .drone-card-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .drone-card-info span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* ============================================
+           CONTACT / FOOTER
+           ============================================ */
+        .footer-section {
+            position: relative;
+            padding: clamp(100px, 15vh, 200px) 40px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .footer-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .footer-glow.left {
+            top: 40%;
+            left: 15%;
+            background: var(--accent);
+        }
+
+        .footer-glow.right {
+            top: 50%;
+            right: 15%;
+            background: #f97316;
+        }
+
+        .footer-heading {
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-style: italic;
+        }
+
+        .footer-heading .underline-accent {
+            text-decoration: underline;
+            text-decoration-color: var(--accent);
+            text-underline-offset: 8px;
+            text-decoration-thickness: 3px;
+        }
+
+        .footer-sub {
+            font-size: 17px;
+            color: var(--text-dim);
+            max-width: 550px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .social-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            transition: all 0.4s var(--ease-out-expo);
+            cursor: none;
+        }
+
+        .social-icon:hover {
+            background: rgba(225, 29, 72, 0.1);
+            border-color: rgba(225, 29, 72, 0.3);
+            transform: scale(1.1);
+            color: #fff;
+        }
+
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 36px;
+            margin-bottom: 60px;
+        }
+
+        .contact-links a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            color: var(--text-dim);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .contact-links a svg { color: var(--accent); }
+        .contact-links a:hover { color: var(--text); }
+
+        .footer-copy {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* ============================================
+           REVEAL ANIMATIONS
+           ============================================ */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(60px);
+        }
+
+        .reveal-section {
+            opacity: 0;
+            clip-path: inset(10% 0 10% 0);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 900px) {
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .drone-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-3d {
+                display: none;
+            }
+
+            .hero-content {
+                padding: 0 24px;
+            }
+
+            .nav {
+                padding: 20px 24px;
+            }
+
+            .section {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .drone-section .section-inner {
+                padding: 0 24px;
+            }
+
+            .footer-section {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .hero-ctas {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
-<body class="selection:bg-rose-500/30">
+<body>
 
-    <!-- 1. HERO SECTION -->
-    <header class="relative h-screen w-full flex items-center justify-center overflow-hidden">
-        <!-- Background Video (High-Res Drone Placeholder) -->
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 cinematic-overlay z-10"></div>
-            <video autoplay loop muted playsinline class="w-full h-full object-cover scale-110" id="hero-video">
+    <!-- LOADING SCREEN -->
+    <div class="loader" id="loader">
+        <div class="loader-counter" id="loaderCounter">0</div>
+        <div class="loader-bar">
+            <div class="loader-bar-fill" id="loaderBarFill"></div>
+        </div>
+        <div class="loader-label">Loading experience</div>
+    </div>
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <div class="cursor-label" id="cursorLabel"></div>
+
+    <!-- SCROLL PROGRESS -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- HUD ELEMENTS -->
+    <div class="hud hud-top-left" id="hudName">SOTIRIS.DEV</div>
+    <div class="hud hud-top-right" id="hudScroll">SCROLL: 0%</div>
+    <div class="hud hud-bottom-left">© 2026</div>
+
+    <!-- NAVIGATION -->
+    <nav class="nav" id="mainNav">
+        <a href="#" class="nav-logo">S.</a>
+        <ul class="nav-links">
+            <li><a href="#hero" data-magnetic>Work</a></li>
+            <li><a href="#portfolio" data-magnetic>CaliForge</a></li>
+            <li><a href="#cinematography" data-magnetic>Drone</a></li>
+            <li><a href="#contact" data-magnetic>Contact</a></li>
+        </ul>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#hero" class="mobile-link">Work</a>
+        <a href="#portfolio" class="mobile-link">CaliForge</a>
+        <a href="#cinematography" class="mobile-link">Drone</a>
+        <a href="#contact" class="mobile-link">Contact</a>
+    </div>
+
+    <!-- ============================================
+         1. HERO SECTION
+         ============================================ -->
+    <section class="hero" id="hero">
+        <div class="hero-video-wrap">
+            <video autoplay loop muted playsinline id="heroVideo">
                 <source src="https://videos.pexels.com/video-files/3205315/3205315-hd_1920_1080_25fps.mp4" type="video/mp4">
             </video>
+            <div class="hero-overlay"></div>
         </div>
 
-        <!-- Content Split Layout -->
-        <div class="relative z-20 container mx-auto px-6 h-full flex flex-col md:flex-row items-center justify-between pt-20">
-            
-            <!-- Left Side: Text -->
-            <div class="w-full md:w-[55%] text-left xl:pr-10">
-                <div id="badge" class="inline-block px-4 py-1.5 rounded-full glass mb-6 text-sm text-rose-500 font-medium tracking-wide border border-rose-500/20">
-                    15-YEAR-OLD CREATOR
-                </div>
-                <!-- Text made smaller -->
-                <h1 class="hero-title text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold leading-none mb-6">
-                    CODE & <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-red-600">CINEMATOGRAPHY</span>
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge" id="heroBadge">15-YEAR-OLD CREATOR</div>
+
+                <h1 class="hero-heading" id="heroHeading">
+                    <span class="line"><span class="char-wrap">CODE &</span></span>
+                    <span class="line"><span class="char-wrap gradient-text">CINEMATOGRAPHY</span></span>
                 </h1>
-                <p class="hero-title text-lg md:text-xl text-zinc-400 max-w-xl mb-10 font-light leading-relaxed">
+
+                <p class="hero-sub" id="heroSub">
                     3rd year middle school student with a dream of becoming a developer. Building WebApps and flying my DJI Mini 4 in 4K.
                 </p>
-                <!-- Buttons aligned to the left -->
-                <div class="hero-title flex flex-col sm:flex-row gap-4 justify-start items-center">
-                    <a href="#portfolio" class="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-rose-500 hover:text-white transition-all transform hover:scale-105 flex items-center gap-2 w-full sm:w-auto justify-center shadow-[0_0_20px_rgba(244,63,94,0.3)]">
-                        <i data-lucide="code" size="20"></i> VIEW CALIFORGE
+
+                <div class="hero-ctas" id="heroCtas">
+                    <a href="#portfolio" class="btn btn-primary" data-magnetic data-cursor="View Project">
+                        <i data-lucide="code" style="width:18px;height:18px"></i> VIEW CALIFORGE
                     </a>
-                    <a href="#cinematography" class="glass text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all transform hover:scale-105 flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <i data-lucide="video" size="20"></i> WATCH DRONE REEL
+                    <a href="#cinematography" class="btn btn-ghost" data-magnetic data-cursor="Watch Reel">
+                        <i data-lucide="video" style="width:18px;height:18px"></i> WATCH DRONE REEL
                     </a>
                 </div>
             </div>
-
-            <!-- Right Side: Massive Absolute 3D Interactive Spline Knot -->
-            <div class="absolute top-1/2 -translate-y-1/2 right-[-50vw] md:right-[-15vw] lg:right-[-10vw] w-[200vw] h-[100vh] md:w-[1000px] md:h-[1000px] lg:w-[1200px] lg:h-[1200px] z-10 pointer-events-none md:pointer-events-auto flex items-center justify-center opacity-60 md:opacity-100">
-                <!-- Extremely large rendering box to guarantee the Spline model is never clipped -->
-                <iframe src="https://my.spline.design/glassknotvortex-7BZFC37gJxREmTcQha72dzAb/" frameborder="0" width="100%" height="100%" class="w-full h-full scale-[0.6] md:scale-[0.7] transform translate-x-10 md:translate-x-20 lg:translate-x-24 origin-center"></iframe>
-            </div>
-
         </div>
 
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 opacity-50 animate-bounce">
-            <i data-lucide="arrow-down-circle" class="text-white"></i>
+        <!-- Spline 3D Model -->
+        <div class="hero-3d" id="hero3d">
+            <iframe src="https://my.spline.design/glassknotvortex-7BZFC37gJxREmTcQha72dzAb/" loading="lazy"></iframe>
         </div>
-    </header>
 
-    <!-- 2. PORTFOLIO SPOTLIGHT: CaliForge -->
-    <section id="portfolio" class="py-32 container mx-auto px-6 max-w-6xl">
-        <div class="flex flex-col md:flex-row items-center gap-16">
-            <div class="w-full md:w-1/2 scroll-reveal">
-                <div class="relative rounded-2xl overflow-hidden glass p-4 border border-zinc-800 transform hover:scale-[1.02] transition-transform duration-500">
-                    <div class="h-8 bg-zinc-900 rounded-t-lg flex items-center px-4 gap-2 border-b border-white/5">
-                        <div class="w-2.5 h-2.5 rounded-full bg-red-400/80"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-400/80"></div>
-                        <div class="w-2.5 h-2.5 rounded-full bg-green-400/80"></div>
-                        <span class="ml-4 text-[10px] text-zinc-500 font-mono tracking-tighter">califorge-six.vercel.app</span>
-                    </div>
-                    <div class="h-[400px] w-full overflow-hidden bg-zinc-950">
-                        <iframe 
-                            src="https://califorge-six.vercel.app" 
-                            class="w-full h-full border-none opacity-80 hover:opacity-100 transition-opacity"
-                            loading="lazy"
-                        ></iframe>
-                    </div>
+        <div class="hero-scroll-indicator" id="heroScroll">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         MARQUEE
+         ============================================ -->
+    <div class="marquee">
+        <div class="marquee-track">
+            <span>DEVELOPER</span>
+            <span class="filled">DRONE PILOT</span>
+            <span>CINEMATOGRAPHY</span>
+            <span class="filled">CALIFORGE</span>
+            <span>DJI MINI 4 PRO</span>
+            <span class="filled">4K AERIAL</span>
+            <span>WEB APPS</span>
+            <span class="filled">CREATIVE CODE</span>
+            <span>DEVELOPER</span>
+            <span class="filled">DRONE PILOT</span>
+            <span>CINEMATOGRAPHY</span>
+            <span class="filled">CALIFORGE</span>
+            <span>DJI MINI 4 PRO</span>
+            <span class="filled">4K AERIAL</span>
+            <span>WEB APPS</span>
+            <span class="filled">CREATIVE CODE</span>
+        </div>
+    </div>
+
+    <!-- ============================================
+         2. PORTFOLIO: CALIFORGE
+         ============================================ -->
+    <section id="portfolio" class="section">
+        <div class="portfolio-grid">
+            <div class="browser-mockup reveal-up" data-tilt>
+                <div class="browser-bar">
+                    <div class="browser-dot red"></div>
+                    <div class="browser-dot yellow"></div>
+                    <div class="browser-dot green"></div>
+                    <span class="browser-url">califorge-six.vercel.app</span>
+                </div>
+                <div class="browser-viewport">
+                    <iframe src="https://califorge-six.vercel.app" loading="lazy"></iframe>
                 </div>
             </div>
-            <div class="w-full md:w-1/2 scroll-reveal text-left">
-                <div class="flex items-center gap-2 text-rose-500 mb-4 font-bold tracking-widest text-xs">
-                    <i data-lucide="monitor" size="14"></i> FEATURED DEVELOPER PROJECT
+
+            <div class="portfolio-info reveal-up">
+                <div class="section-label">
+                    <i data-lucide="monitor" style="width:14px;height:14px"></i>
+                    FEATURED DEVELOPER PROJECT
                 </div>
-                <h2 class="text-5xl font-extrabold mb-6 leading-tight">CaliForge</h2>
-                <p class="text-lg text-zinc-400 mb-8 font-light leading-relaxed">
-                    My flagship web application built with high-performance design in mind. It showcases my ability to create responsive, interactive interfaces that deliver a premium user experience. Hosted on Vercel's edge network for lightning-fast speeds.
-                </p>
-                <div class="grid grid-cols-2 gap-4 mb-10 text-sm font-medium text-zinc-300">
-                    <div class="flex items-center gap-2"><i data-lucide="check-circle" size="16" class="text-rose-500"></i> Next-Gen UI/UX</div>
-                    <div class="flex items-center gap-2"><i data-lucide="check-circle" size="16" class="text-rose-500"></i> Vercel Optimization</div>
-                    <div class="flex items-center gap-2"><i data-lucide="check-circle" size="16" class="text-rose-500"></i> Responsive Scaling</div>
-                    <div class="flex items-center gap-2"><i data-lucide="check-circle" size="16" class="text-rose-500"></i> Interactive Glows</div>
+                <h2 class="section-heading">CaliForge</h2>
+                <p>My flagship web application built with high-performance design in mind. It showcases my ability to create responsive, interactive interfaces that deliver a premium user experience. Hosted on Vercel's edge network for lightning-fast speeds.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                        Next-Gen UI/UX
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                        Vercel Optimization
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                        Responsive Scaling
+                    </div>
+                    <div class="feature-item">
+                        <i data-lucide="check-circle" style="width:16px;height:16px"></i>
+                        Interactive Glows
+                    </div>
                 </div>
-                <a href="https://califorge-six.vercel.app" target="_blank" class="inline-flex items-center gap-3 text-black bg-white px-8 py-4 rounded-full font-bold hover:bg-rose-500 hover:text-white transition-all group">
-                    LAUNCH APPLICATION <i data-lucide="external-link" size="18" class="group-hover:translate-x-1 transition-transform"></i>
+
+                <a href="https://califorge-six.vercel.app" target="_blank" class="btn btn-primary" data-magnetic data-cursor="Launch">
+                    LAUNCH APPLICATION <i data-lucide="external-link" style="width:16px;height:16px"></i>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- 3. DRONE GALLERY: DJI Mini 4 -->
-    <section id="cinematography" class="py-32 bg-zinc-950/50">
-        <div class="container mx-auto px-6 max-w-6xl">
-            <div class="text-center mb-20 scroll-reveal">
-                <h2 class="text-5xl font-extrabold mb-6 italic">DJI MINI 4 PRO CINEMATICS</h2>
-                <p class="text-xl text-zinc-500 font-light">Capturing the world in 4K from the skies. I specialize in Orbit, Tracking, and Waypoint shots.</p>
+    <!-- ============================================
+         3. DRONE CINEMATOGRAPHY
+         ============================================ -->
+    <section id="cinematography" class="drone-section">
+        <div class="section-inner">
+            <div class="drone-header reveal-up">
+                <div class="section-label" style="justify-content:center">
+                    <i data-lucide="video" style="width:14px;height:14px"></i>
+                    AERIAL CINEMATOGRAPHY
+                </div>
+                <h2 class="section-heading" style="text-align:center;font-style:italic">DJI MINI 4 PRO CINEMATICS</h2>
+                <p>Capturing the world in 4K from the skies. I specialize in Orbit, Tracking, and Waypoint shots.</p>
             </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 scroll-reveal">
-                <!-- Video Item 1 -->
-                <div class="relative aspect-video rounded-3xl overflow-hidden glass group cursor-crosshair">
-                    <video autoplay loop muted playsinline class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]">
+
+            <div class="drone-grid">
+                <div class="drone-card reveal-up" data-tilt data-cursor="Play">
+                    <video autoplay loop muted playsinline>
                         <source src="https://videos.pexels.com/video-files/4204543/4204543-uhd_2732_1440_25fps.mp4" type="video/mp4">
                     </video>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-                    <div class="absolute bottom-6 left-8">
-                        <h3 class="text-xl font-bold tracking-tight">URBAN EXPLORATION</h3>
-                        <p class="text-rose-500 text-xs font-bold tracking-widest mt-1 uppercase">4K / D-LOG M</p>
+                    <div class="drone-card-overlay"></div>
+                    <div class="drone-card-info">
+                        <h3>URBAN EXPLORATION</h3>
+                        <span>4K / D-LOG M</span>
                     </div>
                 </div>
-                <!-- Video Item 2 -->
-                <div class="relative aspect-video rounded-3xl overflow-hidden glass group cursor-crosshair">
-                    <video autoplay loop muted playsinline class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2s]">
+
+                <div class="drone-card reveal-up" data-tilt data-cursor="Play">
+                    <video autoplay loop muted playsinline>
                         <source src="https://videos.pexels.com/video-files/19448855/19448855-hd_1920_1080_24fps.mp4" type="video/mp4">
                     </video>
-                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-                    <div class="absolute bottom-6 left-8">
-                        <h3 class="text-xl font-bold tracking-tight">NATURAL COASTLINES</h3>
-                        <p class="text-rose-500 text-xs font-bold tracking-widest mt-1 uppercase">4K / ACTIVE TRACK</p>
+                    <div class="drone-card-overlay"></div>
+                    <div class="drone-card-info">
+                        <h3>NATURAL COASTLINES</h3>
+                        <span>4K / ACTIVE TRACK</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 4. FOOTER & CONTACT -->
-    <footer class="py-40 text-center relative overflow-hidden">
-        <!-- Floating Ambient Glows -->
-        <div class="absolute top-1/2 left-1/4 w-96 h-96 bg-rose-600/10 blur-[150px] -z-10 animate-pulse"></div>
-        <div class="absolute top-1/2 right-1/4 w-96 h-96 bg-red-700/10 blur-[150px] -z-10 animate-pulse duration-[5s]"></div>
+    <!-- ============================================
+         4. FOOTER / CONTACT
+         ============================================ -->
+    <footer id="contact" class="footer-section">
+        <div class="footer-glow left"></div>
+        <div class="footer-glow right"></div>
 
-        <div class="container mx-auto px-6 max-w-2xl scroll-reveal">
-            <h2 class="text-4xl font-extrabold mb-10 leading-tight italic">AVAILABLE FOR <span class="underline decoration-rose-500 underline-offset-8">BIG PROJECTS</span> AND AERIAL GIGS</h2>
-            <p class="text-zinc-500 mb-12 text-lg">Currently in middle school, but ready to work. If you need a website that looks special or drone footage that tells a story, let's talk.</p>
-            
-            <div class="flex justify-center gap-4 md:gap-8 mb-8">
-                <a href="#" class="w-14 h-14 md:w-16 md:h-16 rounded-full glass flex items-center justify-center hover:scale-110 transition-transform text-rose-500 hover:text-white border-rose-500/20">
-                    <i data-lucide="github"></i>
+        <div class="reveal-up" style="position:relative;z-index:1">
+            <h2 class="footer-heading">
+                AVAILABLE FOR <span class="underline-accent">BIG PROJECTS</span> AND AERIAL GIGS
+            </h2>
+            <p class="footer-sub">
+                Currently in middle school, but ready to work. If you need a website that looks special or drone footage that tells a story, let's talk.
+            </p>
+
+            <div class="social-row">
+                <a href="#" class="social-icon" data-magnetic data-cursor="GitHub">
+                    <i data-lucide="github" style="width:22px;height:22px"></i>
                 </a>
-                <a href="#" class="w-14 h-14 md:w-16 md:h-16 rounded-full glass flex items-center justify-center hover:scale-110 transition-transform text-rose-500 hover:text-white border-rose-500/20">
-                    <i data-lucide="instagram"></i>
+                <a href="#" class="social-icon" data-magnetic data-cursor="Instagram">
+                    <i data-lucide="instagram" style="width:22px;height:22px"></i>
                 </a>
-                <a href="mailto:sotirisvas2011@gmail.com" class="w-14 h-14 md:w-16 md:h-16 rounded-full glass flex items-center justify-center hover:scale-110 transition-transform text-rose-500 hover:text-white border-rose-500/20">
-                    <i data-lucide="mail"></i>
+                <a href="mailto:sotirisvas2011@gmail.com" class="social-icon" data-magnetic data-cursor="Email">
+                    <i data-lucide="mail" style="width:22px;height:22px"></i>
                 </a>
-                <a href="tel:+306981847788" class="w-14 h-14 md:w-16 md:h-16 rounded-full glass flex items-center justify-center hover:scale-110 transition-transform text-rose-500 hover:text-white border-rose-500/20">
-                    <i data-lucide="phone"></i>
+                <a href="tel:+306981847788" class="social-icon" data-magnetic data-cursor="Call">
+                    <i data-lucide="phone" style="width:22px;height:22px"></i>
                 </a>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-10 mb-20 text-zinc-400 font-medium">
-                <a href="mailto:sotirisvas2011@gmail.com" class="hover:text-white transition-colors flex items-center gap-2">
-                    <i data-lucide="mail" size="18" class="text-rose-500"></i> sotirisvas2011@gmail.com
+            <div class="contact-links">
+                <a href="mailto:sotirisvas2011@gmail.com" data-magnetic>
+                    <i data-lucide="mail" style="width:16px;height:16px"></i>
+                    sotirisvas2011@gmail.com
                 </a>
-                <a href="tel:+306981847788" class="hover:text-white transition-colors flex items-center gap-2">
-                    <i data-lucide="phone" size="18" class="text-rose-500"></i> +30 6981847788
+                <a href="tel:+306981847788" data-magnetic>
+                    <i data-lucide="phone" style="width:16px;height:16px"></i>
+                    +30 6981847788
                 </a>
             </div>
-            
-            <p class="text-zinc-700 text-xs font-bold tracking-widest uppercase">
+
+            <p class="footer-copy">
                 &copy; 2026 — DESIGNED & BUILT BY A YOUNG DEVELOPER DREAMING BIG.
             </p>
         </div>
     </footer>
 
-    <!-- SCRIPTS -->
+    <!-- ============================================
+         SCRIPTS
+         ============================================ -->
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+    (() => {
+        'use strict';
 
-        // GSAP Initialization
+        // Icons
+        lucide.createIcons();
         gsap.registerPlugin(ScrollTrigger);
 
-        // Hero Entrance Section
-        const tl = gsap.timeline();
-        
-        tl.to("#badge", { opacity: 1, y: 0, duration: 1, ease: "power4.out" })
-          .to(".hero-title", { 
-              opacity: 1, 
-              y: 0, 
-              duration: 1.2, 
-              stagger: 0.2, 
-              ease: "expo.out" 
-          }, "-=0.6");
-
-        // Scroll Reveal Animations
-        document.querySelectorAll('.scroll-reveal').forEach((element) => {
-            gsap.fromTo(element, 
-                { opacity: 0, y: 60 },
-                { 
-                    opacity: 1, 
-                    y: 0, 
-                    duration: 1, 
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: element,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
-                    }
-                }
-            );
+        // ── LENIS SMOOTH SCROLL ──
+        const lenis = new Lenis({
+            duration: 1.6,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            smoothWheel: true,
         });
 
-        // Parallax Effect for Hero Video
-        gsap.to("#hero-video", {
-            yPercent: 20,
-            ease: "none",
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+
+        // ── LOADING SCREEN ──
+        const loader = document.getElementById('loader');
+        const counter = document.getElementById('loaderCounter');
+        const barFill = document.getElementById('loaderBarFill');
+        let count = 0;
+
+        lenis.stop();
+
+        const loadInterval = setInterval(() => {
+            count += Math.floor(Math.random() * 8) + 2;
+            if (count >= 100) {
+                count = 100;
+                clearInterval(loadInterval);
+                counter.textContent = '100';
+                barFill.style.width = '100%';
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                    lenis.start();
+                    playHeroEntrance();
+                }, 600);
+                return;
+            }
+            counter.textContent = count;
+            barFill.style.width = count + '%';
+        }, 60);
+
+        // ── CUSTOM CURSOR ──
+        const dot = document.getElementById('cursorDot');
+        const ring = document.getElementById('cursorRing');
+        const cursorLabel = document.getElementById('cursorLabel');
+        let mouseX = 0, mouseY = 0;
+        let dotX = 0, dotY = 0, ringX = 0, ringY = 0;
+
+        if (window.matchMedia('(pointer: fine)').matches) {
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function animateCursor() {
+                dotX += (mouseX - dotX) * 0.25;
+                dotY += (mouseY - dotY) * 0.25;
+                ringX += (mouseX - ringX) * 0.12;
+                ringY += (mouseY - ringY) * 0.12;
+
+                dot.style.left = dotX + 'px';
+                dot.style.top = dotY + 'px';
+                ring.style.left = ringX + 'px';
+                ring.style.top = ringY + 'px';
+                cursorLabel.style.left = ringX + 'px';
+                cursorLabel.style.top = (ringY + 50) + 'px';
+
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+
+            // Hover states
+            const hoverTargets = document.querySelectorAll('a, button, [data-cursor], [data-tilt]');
+            hoverTargets.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    dot.classList.add('hovering');
+                    ring.classList.add('hovering');
+                    const label = el.dataset.cursor;
+                    if (label) {
+                        cursorLabel.textContent = label;
+                        cursorLabel.classList.add('visible');
+                    }
+                });
+                el.addEventListener('mouseleave', () => {
+                    dot.classList.remove('hovering');
+                    ring.classList.remove('hovering');
+                    cursorLabel.classList.remove('visible');
+                });
+            });
+
+            // ── MAGNETIC PHYSICS ──
+            document.querySelectorAll('[data-magnetic]').forEach(el => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const dx = e.clientX - rect.left - rect.width / 2;
+                    const dy = e.clientY - rect.top - rect.height / 2;
+                    gsap.to(el, { x: dx * 0.35, y: dy * 0.35, duration: 0.8, ease: 'power3.out' });
+                });
+                el.addEventListener('mouseleave', () => {
+                    gsap.to(el, { x: 0, y: 0, duration: 1.4, ease: 'elastic.out(1, 0.3)' });
+                });
+            });
+
+            // ── 3D TILT ON CARDS ──
+            document.querySelectorAll('[data-tilt]').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const cx = e.clientX - rect.left;
+                    const cy = e.clientY - rect.top;
+                    const px = (cx / rect.width - 0.5) * 2;
+                    const py = (cy / rect.height - 0.5) * 2;
+                    gsap.to(card, {
+                        rotateY: px * 8,
+                        rotateX: -py * 8,
+                        duration: 0.6,
+                        ease: 'power2.out',
+                        transformPerspective: 800,
+                    });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        rotateY: 0,
+                        rotateX: 0,
+                        duration: 1.2,
+                        ease: 'elastic.out(1, 0.5)',
+                    });
+                });
+            });
+        }
+
+        // ── SCROLL PROGRESS ──
+        const progressBar = document.getElementById('scrollProgress');
+        gsap.to(progressBar, {
+            scaleX: 1,
+            ease: 'none',
             scrollTrigger: {
-                trigger: "header",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
+                trigger: document.body,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 0.3,
             }
         });
+
+        // ── HUD SCROLL COUNTER ──
+        const hudScroll = document.getElementById('hudScroll');
+        lenis.on('scroll', ({ progress }) => {
+            hudScroll.textContent = 'SCROLL: ' + Math.round(progress * 100) + '%';
+        });
+
+        // ── HERO ENTRANCE ──
+        function playHeroEntrance() {
+            const tl = gsap.timeline();
+
+            // Split text into chars
+            const charWraps = document.querySelectorAll('.char-wrap');
+            charWraps.forEach(wrap => {
+                const text = wrap.textContent;
+                const isGradient = wrap.classList.contains('gradient-text');
+                wrap.innerHTML = '';
+                text.split('').forEach((ch, i) => {
+                    const span = document.createElement('span');
+                    span.className = 'char' + (isGradient ? ' gradient-text' : '');
+                    span.textContent = ch === ' ' ? '\u00A0' : ch;
+                    span.style.transitionDelay = (i * 0.03) + 's';
+                    wrap.appendChild(span);
+                });
+            });
+
+            tl.to('#heroBadge', {
+                opacity: 1, y: 0, duration: 0.8, ease: 'power3.out'
+            })
+            .to('.char', {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.025,
+                ease: 'power4.out',
+            }, '-=0.4')
+            .to('#heroSub', {
+                opacity: 1, y: 0, duration: 1, ease: 'power3.out'
+            }, '-=0.5')
+            .to('#heroCtas', {
+                opacity: 1, y: 0, duration: 1, ease: 'power3.out'
+            }, '-=0.6')
+            .to('#heroScroll', {
+                opacity: 0.5, duration: 1, ease: 'power2.out'
+            }, '-=0.3');
+        }
+
+        // ── HERO VIDEO PARALLAX ──
+        gsap.to('#heroVideo', {
+            yPercent: 25,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true,
+            }
+        });
+
+        // ── 3D MODEL PARALLAX ──
+        gsap.to('#hero3d', {
+            y: -150,
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.hero',
+                start: 'top top',
+                end: 'bottom top',
+                scrub: true,
+            }
+        });
+
+        // ── SCROLL REVEAL ANIMATIONS ──
+        document.querySelectorAll('.reveal-up').forEach(el => {
+            gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 1.2,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse',
+                }
+            });
+        });
+
+        // ── DRONE SECTION CLIP REVEAL ──
+        gsap.to('.drone-section', {
+            scrollTrigger: {
+                trigger: '.drone-section',
+                start: 'top 90%',
+                end: 'top 40%',
+                scrub: true,
+                onUpdate: (self) => {
+                    const p = self.progress;
+                    document.querySelector('.drone-section').style.clipPath =
+                        `inset(${(1 - p) * 8}% 0 ${(1 - p) * 8}% 0 round ${(1 - p) * 30}px)`;
+                }
+            }
+        });
+
+        // ── MOBILE MENU ──
+        const toggle = document.getElementById('mobileToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        toggle.addEventListener('click', () => {
+            toggle.classList.toggle('open');
+            mobileMenu.classList.toggle('open');
+            if (mobileMenu.classList.contains('open')) {
+                lenis.stop();
+            } else {
+                lenis.start();
+            }
+        });
+
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                toggle.classList.remove('open');
+                mobileMenu.classList.remove('open');
+                lenis.start();
+            });
+        });
+
+        // ── SMOOTH SCROLL NAV LINKS ──
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(anchor.getAttribute('href'));
+                if (target) {
+                    lenis.scrollTo(target, { offset: -80, duration: 2 });
+                }
+            });
+        });
+
+    })();
     </script>
 </body>
 </html>
